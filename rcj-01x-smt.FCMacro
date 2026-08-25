@@ -1,0 +1,91 @@
+#*****************************************************************************
+#
+#  System        : 
+#  Module        : 
+#  Object Name   : $RCSfile$
+#  Revision      : $Revision$
+#  Date          : $Date$
+#  Author        : $Author$
+#  Created By    : Robert Heller
+#  Created       : 2026-08-25 16:49:45
+#  Last Modified : <260825.1709>
+#
+#  Description	
+#
+#  Notes
+#
+#  History
+#	
+#*****************************************************************************
+#
+#    Copyright (C) 2026  Robert Heller D/B/A Deepwoods Software
+#			51 Locke Hill Road
+#			Wendell, MA 01379-9728
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# 
+#
+#*****************************************************************************
+
+
+import FreeCAD as App
+import Part, TechDraw, Mesh, Import
+from FreeCAD import Base
+
+import os
+import sys
+sys.path.append(os.path.dirname(__file__))
+
+def debug(fmt,*args):
+    print(fmt % args,file=sys.stderr)
+    
+class rcj_01x_smt(object):
+    __socketod = 8.3
+    __socketlen = 8.3
+    __centZ = 6.5
+    __backwidth = 11.0
+    __backheight = 12.0
+    __backdepth = 6.7
+    def __init__(self,name,origin=Base.Vector(0,0,0)):
+        self.name = name
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        self.origin = origin
+        back = Part.makePlane(self.__backwidth,self.__backdepth,
+                               origin.add(Base.Vector(-self.__backwidth/2,0,0))
+                      ).extrude(Base.Vector(0,0,self.__backheight))
+        socket = Part.makeCylinder(self.__socketod/2,
+                                   self.__socketlen,
+                                   origin.add(Base.Vector(
+                                            0,-self.__socketlen,
+                                            self.__centZ)),
+                                   Base.Vector(0,1,0))
+        self.object = back.fuse(socket)
+    def show(self,doc=None):
+        if doc==None:
+            doc = App.activeDocument() 
+        obj = doc.addObject("Part::Feature",self.name)
+        obj.Shape = self.object
+        obj.Label=self.name
+        obj.ViewObject.ShapeColor=(0.75,0.75,0.75)
+
+
+if __name__ == '__main__':
+    doc = App.newDocument("rcj-01x-smt")
+    part = rcj_01x_smt("rcj-01x-smt")
+    part.show(doc)
+    Gui.SendMsgToActiveView("ViewFit")
+                        
