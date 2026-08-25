@@ -1896,7 +1896,7 @@
     (property "Value" "RCA" (id 1) (at 190.5 81.5731 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "ExtraFootprints:RCJ-01X-SMT" (id 2) (at 187.96 80.01 0)
+    (property "Footprint" "ExtraFootprints:RCJ011SMTTR" (id 2) (at 187.96 80.01 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" " ~" (id 3) (at 187.96 80.01 0)
@@ -2107,7 +2107,7 @@
     (property "Value" "RCA" (id 1) (at 190.5 102.5767 0)
       (effects (font (size 1.27 1.27)) (justify left))
     )
-    (property "Footprint" "ExtraFootprints:RCJ-01X-SMT" (id 2) (at 187.96 101.6 0)
+    (property "Footprint" "ExtraFootprints:RCJ011SMTTR" (id 2) (at 187.96 101.6 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" " ~" (id 3) (at 187.96 101.6 0)
@@ -3036,13 +3036,13 @@
       (reference "CN2") (unit 1) (value "XLR3") (footprint "Connector_Audio:Jack_XLR_Neutrik_NC3FAAH_Horizontal")
     )
     (path "/4c3d3666-bc3e-4987-90c4-3ebbfcf544f3"
-      (reference "CN3") (unit 1) (value "RCA") (footprint "ExtraFootprints:RCJ-01X-SMT")
+      (reference "CN3") (unit 1) (value "RCA") (footprint "ExtraFootprints:RCJ011SMTTR")
     )
     (path "/3fd48c97-6861-4588-baab-98ec7532f17c"
       (reference "CN4") (unit 1) (value "XLR3") (footprint "Connector_Audio:Jack_XLR_Neutrik_NC3FAAH_Horizontal")
     )
     (path "/7325c380-b550-41b9-8e02-9dea196ee4ca"
-      (reference "CN5") (unit 1) (value "RCA") (footprint "ExtraFootprints:RCJ-01X-SMT")
+      (reference "CN5") (unit 1) (value "RCA") (footprint "ExtraFootprints:RCJ011SMTTR")
     )
     (path "/a2b98f00-1643-448a-8782-28a59494867a"
       (reference "D1") (unit 1) (value "Power") (footprint "LED_SMD:LED_0805_2012Metric")
@@ -3078,7 +3078,7 @@
       (reference "H204") (unit 1) (value "MountingHole") (footprint "MountingHole:MountingHole_3.2mm_M3")
     )
     (path "/4a33f9d6-fa15-4f3b-b76e-6954981c4d39/ac097fe2-7127-4be0-b57d-aabba16451ec"
-      (reference "J201") (unit 1) (value "5V In") (footprint "Connector_BarrelJack:BarrelJack_Kycon_KLDX-0202-xC_Horizontal")
+      (reference "J201") (unit 1) (value "5V In") (footprint "ExtraFootprints:KLDX0202AC")
     )
     (path "/4a33f9d6-fa15-4f3b-b76e-6954981c4d39/91b33090-e8d0-4418-9a22-5a51bf2330fb"
       (reference "J202") (unit 1) (value "Power") (footprint "Connector_PinSocket_2.54mm:PinSocket_1x04_P2.54mm_Vertical")

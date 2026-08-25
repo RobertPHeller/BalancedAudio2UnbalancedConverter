@@ -1294,7 +1294,7 @@
     (uuid ac097fe2-7127-4be0-b57d-aabba16451ec)
     (property "Reference" "J201" (id 0) (at 85.09 119.38 0))
     (property "Value" "5V In" (id 1) (at 85.09 121.92 0))
-    (property "Footprint" "Connector_BarrelJack:BarrelJack_Kycon_KLDX-0202-xC_Horizontal" (id 2) (at 86.36 129.286 0)
+    (property "Footprint" "ExtraFootprints:KLDX0202AC" (id 2) (at 86.36 129.286 0)
       (effects (font (size 1.27 1.27)) hide)
     )
     (property "Datasheet" "~" (id 3) (at 86.36 129.286 0)
