@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "ExtraSymbols")(type "KiCad")(uri "${KIPRJMOD}/ExtraSymbols.kicad_sym")(options "")(descr ""))
+  (lib (name "PowerSupplys")(type "KiCad")(uri "${KIPRJMOD}/LT3582EUD-12#PBF.kicad_sym")(options "")(descr ""))
+)
