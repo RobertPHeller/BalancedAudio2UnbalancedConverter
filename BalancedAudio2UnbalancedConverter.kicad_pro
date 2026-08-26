@@ -398,8 +398,8 @@
       "idf": "",
       "netlist": "",
       "specctra_dsn": "",
-      "step": "",
-      "vrml": ""
+      "step": "BalancedAudio2UnbalancedConverter.step",
+      "vrml": "BalancedAudio2UnbalancedConverter-AudioBoard.wrl"
     },
     "page_layout_descr_file": ""
   },
