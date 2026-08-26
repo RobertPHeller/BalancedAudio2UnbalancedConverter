@@ -1,0 +1,123 @@
+#*****************************************************************************
+#
+#  System        : 
+#  Module        : 
+#  Object Name   : $RCSfile$
+#  Revision      : $Revision$
+#  Date          : $Date$
+#  Author        : $Author$
+#  Created By    : Robert Heller
+#  Created       : 2026-08-26 09:33:18
+#  Last Modified : <260826.1325>
+#
+#  Description	
+#
+#  Notes
+#
+#  History
+#	
+#*****************************************************************************
+#
+#    Copyright (C) 2026  Robert Heller D/B/A Deepwoods Software
+#			51 Locke Hill Road
+#			Wendell, MA 01379-9728
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# 
+#
+#*****************************************************************************
+
+
+import FreeCAD as App
+import Part, TechDraw, Mesh, Import
+from FreeCAD import Base
+
+import os
+import sys
+sys.path.append(os.path.dirname(__file__))
+
+def debug(fmt,*args):
+    print(fmt % args,file=sys.stderr)
+    
+class Case(object):
+    __audioBoard = os.path.dirname(__file__)+"BalancedAudio2UnbalancedConverter-AudioBoard.step"
+    __powerSupplyBoard = os.path.dirname(__file__)+"BalancedAudio2UnbalancedConverter-PowerSupply.step"
+    __caseWallThick = (1/8)*25.4
+    __psBoardOffBottom = (1/4)*25.4
+    __audioBoardOffpsBoard = 8.65+2.59+1.5
+    __boardThick = 1.6
+    __mountingHoleCenters = [(3.81, 3.81), (3.81, 57.15), (87.63, 57.15), (87.63, 3.81)]
+    __spacerRadius = 3.2
+    __holeRadius = 1.6
+    def __spacer(self,index,z0,zLength):
+        holeX, holeY = self.__mountingHoleCenters[index]
+        spacer = Part.makeCylinder(self.__spacerRadius,zLength,
+                                   self.origin.add(Base.Vector(holeX,holeY,z0)))
+        spacer = spacer.cut(
+            Part.makeCylinder(self.__holeRadius,zLength,
+                              self.origin.add(Base.Vector(holeX,holeY,z0)))
+                            )
+        return spacer
+    def __init__(self,name,origin=Base.Vector(0,0,0)):
+        self.name = name
+        if not isinstance(origin,Base.Vector):
+            raise RuntimeError("origin is not a Vector!")
+        self.origin = origin
+        self.audioboard = Part.read(self.__audioBoard)
+        bbox=self.audioboard.BoundBox 
+        # translate board to origin
+        self.audioboard.translate(Base.Vector(-bbox.XMin,-bbox.YMin,-bbox.ZMin))
+        self.audioboard.translate(self.origin.add(Base.Vector(0,-8.48,-8.59)))
+        self.powersupply = Part.read(self.__powerSupplyBoard)
+        bbox=self.powersupply.BoundBox
+        # translate board to origin
+        self.powersupply.translate(Base.Vector(-bbox.XMin,-bbox.YMin,-bbox.ZMin))
+        self.powersupply.translate(self.origin.add(Base.Vector(0,0,-3.85)))
+        self.powersupply.translate(Base.Vector(0,0,self.__caseWallThick+ 
+                                                    self.__psBoardOffBottom))
+        self.audioboard.translate(Base.Vector(0,0,self.__caseWallThick+
+                                                    self.__psBoardOffBottom+
+                                                    self.__audioBoardOffpsBoard))
+        self.spacers = []
+        z0 = self.__caseWallThick+self.__psBoardOffBottom+self.__boardThick
+        zLength = self.__audioBoardOffpsBoard - self.__boardThick
+        for i in range(0,4):
+            self.spacers.append(self.__spacer(i,z0,zLength))
+    def show(self,doc=None):
+        if doc==None:
+            doc = App.activeDocument()
+        obj = doc.addObject("Part::Feature",self.name+'_audioboard')
+        obj.Shape = self.audioboard
+        obj.Label=self.name+'_audioboard'
+        obj = doc.addObject("Part::Feature",self.name+'_powersupply')
+        obj.Shape = self.powersupply
+        obj.Label=self.name+'_powersupply'
+        for i in range(0,4):
+            spacerName = "%s_spacer%d"%(self.name,i)
+            obj = doc.addObject("Part::Feature",spacerName)
+            obj.Shape = self.spacers[i]
+            obj.Label=spacerName
+            obj.ViewObject.ShapeColor=(0.0,0.0,0.0)
+            
+        
+
+if __name__ == '__main__':
+    doc = App.newDocument("Case")
+    case = Case("Case")
+    case.show(doc)
+    Gui.activeDocument().activeView().viewTop()
+    Gui.SendMsgToActiveView("ViewFit")
+    
