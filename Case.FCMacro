@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-08-26 09:33:18
-#  Last Modified : <260826.1325>
+#  Last Modified : <260826.1338>
 #
 #  Description	
 #
@@ -62,6 +62,9 @@ class Case(object):
     __mountingHoleCenters = [(3.81, 3.81), (3.81, 57.15), (87.63, 57.15), (87.63, 3.81)]
     __spacerRadius = 3.2
     __holeRadius = 1.6
+    __boardLength = 91.44
+    __boardWidth = 60.96 
+    __totalCaseHeight = 65
     def __spacer(self,index,z0,zLength):
         holeX, holeY = self.__mountingHoleCenters[index]
         spacer = Part.makeCylinder(self.__spacerRadius,zLength,
