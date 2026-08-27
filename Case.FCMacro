@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-08-26 09:33:18
-#  Last Modified : <260827.1126>
+#  Last Modified : <260827.1325>
 #
 #  Description	
 #
@@ -277,6 +277,35 @@ class Case(object):
         obj.Label=self.name+'_powerLedRod'
         obj.ViewObject.ShapeColor=(1.0,1.0,1.0)
         obj.ViewObject.Transparency=100
+    def MakeSTLs(self,filePrefix):
+        doc = App.newDocument("tempSTL")
+        obj = doc.addObject("Part::Feature","temp")
+        obj.Shape = self.top
+        objs = [obj]
+        Mesh.export(objs,"%s_Top.stl"%(filePrefix))
+        doc.removeObject(obj.Label)
+        obj = doc.addObject("Part::Feature","temp")
+        obj.Shape = self.bottom
+        objs = [obj]
+        Mesh.export(objs,"%s_Bottom.stl"%(filePrefix))
+        doc.removeObject(obj.Label) 
+        obj = doc.addObject("Part::Feature","temp")
+        obj.Shape = self.front
+        objs = [obj]
+        Mesh.export(objs,"%s_Front.stl"%(filePrefix))
+        doc.removeObject(obj.Label) 
+        obj = doc.addObject("Part::Feature","temp")
+        obj.Shape = self.rear
+        objs = [obj]
+        Mesh.export(objs,"%s_Rear.stl"%(filePrefix))
+        doc.removeObject(obj.Label) 
+        for i in range(0,4):
+            obj = doc.addObject("Part::Feature","temp")
+            obj.Shape = self.spacers[i] 
+            objs = [obj]
+            Mesh.export(objs,"%s_Spacer%d.stl"%(filePrefix,i))
+            doc.removeObject(obj.Label) 
+        App.closeDocument("tempSTL")
         
 
 if __name__ == '__main__':
@@ -285,4 +314,4 @@ if __name__ == '__main__':
     case.show(doc)
     Gui.activeDocument().activeView().viewTop()
     Gui.SendMsgToActiveView("ViewFit")
-    
+    case.MakeSTLs("Case")
