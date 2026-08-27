@@ -8,7 +8,7 @@
 #  Author        : $Author$
 #  Created By    : Robert Heller
 #  Created       : 2026-08-26 09:33:18
-#  Last Modified : <260826.1338>
+#  Last Modified : <260827.1126>
 #
 #  Description	
 #
@@ -56,6 +56,7 @@ class Case(object):
     __audioBoard = os.path.dirname(__file__)+"BalancedAudio2UnbalancedConverter-AudioBoard.step"
     __powerSupplyBoard = os.path.dirname(__file__)+"BalancedAudio2UnbalancedConverter-PowerSupply.step"
     __caseWallThick = (1/8)*25.4
+    __endPanelThick = (1/16)*25.4
     __psBoardOffBottom = (1/4)*25.4
     __audioBoardOffpsBoard = 8.65+2.59+1.5
     __boardThick = 1.6
@@ -65,6 +66,19 @@ class Case(object):
     __boardLength = 91.44
     __boardWidth = 60.96 
     __totalCaseHeight = 65
+    __caseLength = 91.44+(2*(1/8)*25.4)
+    __caseWidth  = 60.96+(2*(1/8)*25.4)
+    __XLRHoleDia = 22
+    __XLRHoleZ   = 36.42
+    __XLRHoleX   = [21.40, 69.66]
+    __barrelJackHoleX = 38.07
+    __barrelJackHoleZ = 10.94
+    __barrelJackHoleW = 47.07-38.07
+    __barrelJackHoleH = 21.68-10.94
+    __powerLedX       = 23.1902 - 20.32
+    __powerLetY       = 81.28   - 29.21
+    __powerLetRodDia  = 1.6 # AR-2 1/16" 1.6mm
+    __powerLetZOffBoard = 0.8
     def __spacer(self,index,z0,zLength):
         holeX, holeY = self.__mountingHoleCenters[index]
         spacer = Part.makeCylinder(self.__spacerRadius,zLength,
@@ -91,14 +105,142 @@ class Case(object):
         self.powersupply.translate(self.origin.add(Base.Vector(0,0,-3.85)))
         self.powersupply.translate(Base.Vector(0,0,self.__caseWallThick+ 
                                                     self.__psBoardOffBottom))
-        self.audioboard.translate(Base.Vector(0,0,self.__caseWallThick+
-                                                    self.__psBoardOffBottom+
-                                                    self.__audioBoardOffpsBoard))
+        audioboardZ = self.__caseWallThick+\
+                        self.__psBoardOffBottom+self.__audioBoardOffpsBoard
+        self.audioboard.translate(Base.Vector(0,0,audioboardZ))
         self.spacers = []
         z0 = self.__caseWallThick+self.__psBoardOffBottom+self.__boardThick
         zLength = self.__audioBoardOffpsBoard - self.__boardThick
         for i in range(0,4):
             self.spacers.append(self.__spacer(i,z0,zLength))
+        bottom = Part.makePlane(self.__caseLength,self.__caseWidth,
+                                origin.add(Base.Vector(-self.__caseWallThick,
+                                                       -self.__caseWallThick,
+                                                       0))
+                              ).extrude(Base.Vector(0,0,self.__caseWallThick))
+        for i in range(0,4):
+            holeX, holeY = self.__mountingHoleCenters[i]
+            o = origin.add(Base.Vector(holeX,holeY,0))
+            bottom = bottom.cut(
+                Part.makeCylinder(self.__holeRadius,self.__caseWallThick,o)
+            )
+            bottom = bottom.fuse(
+                self.__spacer(i,self.__caseWallThick,self.__psBoardOffBottom)
+            )
+        sidewallheight = (self.__totalCaseHeight-
+                                    (2*self.__caseWallThick))/2
+        left = Part.makePlane(sidewallheight,
+                              self.__caseWidth,
+                              origin.add(Base.Vector(-self.__caseWallThick,
+                                                     self.__caseWidth
+                                                        -self.__caseWallThick,
+                                                     self.__caseWallThick)),
+                              Base.Vector(1,0,0)
+                 ).extrude(Base.Vector(self.__caseWallThick,0,0))
+        right = Part.makePlane(sidewallheight,
+                              self.__caseWidth,
+                              origin.add(Base.Vector(self.__caseLength
+                                                        -2*self.__caseWallThick,
+                                                     self.__caseWidth
+                                                        -self.__caseWallThick,
+                                                     self.__caseWallThick)),
+                              Base.Vector(1,0,0)
+                 ).extrude(Base.Vector(self.__caseWallThick,0,0))
+        bottom = bottom.fuse(left).fuse(right)
+        top = Part.makePlane(self.__caseLength,self.__caseWidth,
+                                origin.add(Base.Vector(-self.__caseWallThick,
+                                                       -self.__caseWallThick,
+                                                       self.__totalCaseHeight -
+                                                        self.__caseWallThick))
+                              ).extrude(Base.Vector(0,0,self.__caseWallThick))
+        spacerZ = audioboardZ+self.__boardThick
+        spacerLength = (self.__totalCaseHeight - self.__caseWallThick) - \
+                            spacerZ
+        for i in range(0,4):
+            holeX, holeY = self.__mountingHoleCenters[i]
+            o = origin.add(Base.Vector(holeX,holeY,self.__totalCaseHeight -
+                                                    self.__caseWallThick))
+            top = top.cut(
+                Part.makeCylinder(self.__holeRadius,self.__caseWallThick,o)
+            )
+            
+            top = top.fuse(
+                self.__spacer(i,spacerZ,spacerLength)
+            )
+        left = Part.makePlane(sidewallheight,
+                              self.__caseWidth,
+                              origin.add(Base.Vector(-self.__caseWallThick,
+                                                     self.__caseWidth
+                                                        -self.__caseWallThick,
+                                                     self.__caseWallThick+
+                                                        sidewallheight)),
+                              Base.Vector(1,0,0)
+                 ).extrude(Base.Vector(self.__caseWallThick,0,0))
+        right = Part.makePlane(sidewallheight,
+                              self.__caseWidth,
+                              origin.add(Base.Vector(self.__caseLength
+                                                        -2*self.__caseWallThick,
+                                                     self.__caseWidth
+                                                        -self.__caseWallThick,
+                                                     self.__caseWallThick+
+                                                         sidewallheight)),
+                              Base.Vector(1,0,0)
+                 ).extrude(Base.Vector(self.__caseWallThick,0,0))
+        top = top.fuse(left).fuse(right)
+        powerLedRodZ = audioboardZ+self.__boardThick+self.__powerLetZOffBoard
+        powerLedRodLength = self.__totalCaseHeight-powerLedRodZ
+        powerLedRod = Part.makeCylinder(self.__powerLetRodDia/2,
+                                        powerLedRodLength,
+                                        origin.add(
+                                            Base.Vector(self.__powerLedX,
+                                                        self.__powerLetY,
+                                                        powerLedRodZ)))
+        top = top.cut(powerLedRod)
+        self.powerLedRod = powerLedRod
+        endPanelHeight = self.__totalCaseHeight-self.__caseWallThick
+        endPanelLength = self.__caseLength-self.__caseWallThick
+        endPanelZ = self.__caseWallThick/2
+        endPanelX = -self.__caseWallThick/2
+        frontPanelY = -self.__caseWallThick/2
+        rearPanelY = self.__caseWidth-(2*self.__caseWallThick)
+        front = Part.makePlane(endPanelHeight,endPanelLength,
+                               origin.add(Base.Vector(endPanelX,
+                                                      frontPanelY,
+                                                      endPanelZ)),
+                               Base.Vector(0,1,0)
+                            ).extrude(Base.Vector(0,self.__caseWallThick/2,0))
+        for i in range(0,2):
+            xlrHole = Part.makeCylinder(self.__XLRHoleDia/2,
+                                        self.__caseWallThick/2,
+                                        origin.add(
+                                            Base.Vector(self.__XLRHoleX[i],
+                                                        frontPanelY,
+                                                        self.__XLRHoleZ)),
+                                        Base.Vector(0,1,0))
+            front = front.cut(xlrHole)
+        bottom = bottom.cut(front)
+        top = top.cut(front)
+        rear = Part.makePlane(endPanelHeight,endPanelLength,
+                               origin.add(Base.Vector(endPanelX,
+                                                      rearPanelY,
+                                                      endPanelZ)),
+                               Base.Vector(0,1,0)
+                            ).extrude(Base.Vector(0,self.__caseWallThick/2,0))
+        barrelJackHole = Part.makePlane(self.__barrelJackHoleH,
+                                        self.__barrelJackHoleW,
+                                        origin.add(
+                                            Base.Vector(self.__barrelJackHoleX,
+                                                        rearPanelY,
+                                                        self.__barrelJackHoleZ)),
+                                        Base.Vector(0,1,0)
+                                        ).extrude(Base.Vector(0,self.__caseWallThick/2,0))
+        rear = rear.cut(barrelJackHole).cut(self.audioboard)
+        bottom = bottom.cut(rear)
+        top = top.cut(rear)
+        self.bottom = bottom
+        self.top = top
+        self.front = front
+        self.rear = rear
     def show(self,doc=None):
         if doc==None:
             doc = App.activeDocument()
@@ -114,7 +256,27 @@ class Case(object):
             obj.Shape = self.spacers[i]
             obj.Label=spacerName
             obj.ViewObject.ShapeColor=(0.0,0.0,0.0)
-            
+        obj = doc.addObject("Part::Feature",self.name+'_bottom')
+        obj.Shape = self.bottom
+        obj.Label=self.name+'_bottom'
+        obj.ViewObject.ShapeColor=(0.0,0.0,0.0)
+        obj = doc.addObject("Part::Feature",self.name+'_top')
+        obj.Shape = self.top
+        obj.Label=self.name+'_top'
+        obj.ViewObject.ShapeColor=(0.0,0.0,0.0)
+        obj = doc.addObject("Part::Feature",self.name+'_front')
+        obj.Shape = self.front
+        obj.Label=self.name+'_front'
+        obj.ViewObject.ShapeColor=(0.0,0.0,0.0)
+        obj = doc.addObject("Part::Feature",self.name+'_rear')
+        obj.Shape = self.rear
+        obj.Label=self.name+'_rear'
+        obj.ViewObject.ShapeColor=(0.0,0.0,0.0)
+        obj = doc.addObject("Part::Feature",self.name+'_powerLedRod')
+        obj.Shape = self.powerLedRod
+        obj.Label=self.name+'_powerLedRod'
+        obj.ViewObject.ShapeColor=(1.0,1.0,1.0)
+        obj.ViewObject.Transparency=100
         
 
 if __name__ == '__main__':
